@@ -1,0 +1,551 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9f9f9;
+}
+
+
+/* Content */
+.contentWrapper {
+  flex: 1;
+  padding: 105px 0 0;
+}
+
+.container {
+  max-width: 1512px;
+  margin: 0 auto;
+  padding: 80px 180px;
+  position: relative;
+}
+
+/* Page Header */
+.pageHeader {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.pageTitle {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.219em;
+  letter-spacing: 0.05em;
+  color: #0b3364;
+  margin-bottom: 8px;
+}
+
+.pageSubtitle {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.219em;
+  letter-spacing: 0.05em;
+  color: #0b3364;
+  margin: 0;
+}
+
+/* Search and Filter */
+.searchWrapper {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px; /* было 90px, уменьшила, чтобы категории шли сразу под поиском */
+}
+
+.searchInput {
+  flex: 1;
+  max-width: 802px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 15px 64px 15px 21px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 50px;
+}
+
+.searchIcon {
+  width: 21px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.searchField {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.15em;
+  letter-spacing: 0.05em;
+  color: #000000;
+  background: transparent;
+}
+
+.searchField::placeholder {
+  color: #d9d9d9;
+}
+
+.searchButton {
+  width: 160px;
+  height: 50px;
+  background: #0c3465;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.searchButton:hover {
+  background: #0a2850;
+}
+
+.searchButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.searchButton span {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.219em;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+.filterButton {
+  width: 216px;
+  height: 50px;
+  background: #0c3465;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filterButton:hover {
+  background: #0a2850;
+}
+
+.filterIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.filterButton span {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.219em;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+/* 🔹 КАТЕГОРИИ СПЕЦИАЛЬНОСТЕЙ ПОД ПОИСКОМ */
+.specialtiesWrapper {
+  margin-top: 8px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.specialtyButton {
+  border: 1px solid #0c3465;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: #0c3465;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.specialtyButton:hover {
+  background: #0c3465;
+  color: #ffffff;
+}
+
+/* Doctors List */
+.doctorsList {
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+}
+
+.doctorCardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.doctorCardLink:hover {
+  transform: translateY(-2px);
+}
+
+.doctorCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px 39px 25px 39px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  transition: all 0.3s;
+}
+
+.doctorCard:hover {
+  box-shadow: 0 4px 12px rgba(4, 41, 85, 0.1);
+  transform: translateX(5px);
+}
+
+.doctorAvatar {
+  width: 73px;
+  height: 82px;
+  border-radius: 100px;
+  overflow: hidden;
+  background: #e6e4e5;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doctorInfo {
+  flex: 1;
+}
+
+.doctorName {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.4em;
+  color: #0c3465;
+  margin: 0 0 6px 0;
+}
+
+.doctorPosition {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.15em;
+  letter-spacing: 0.05em;
+  color: #000000;
+  margin: 0;
+}
+
+.appointmentButton {
+  width: 205px;
+  height: 58px;
+  background: #0c3465;
+  border: none;
+  border-radius: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.appointmentButton:hover {
+  background: #0a2850;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(12, 52, 101, 0.3);
+}
+
+.buttonText {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 4.067em;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* Scrollbar */
+.scrollbar {
+  position: absolute;
+  right: 11px;
+  top: 411px;
+  width: 9px;
+  height: 68px;
+  background: #cccccc;
+  border-radius: 7px;
+}
+
+/* Footer */
+.footer {
+  background: #002859;
+  padding: 34px 0;
+  margin-top: auto;
+}
+
+.footerContainer {
+  max-width: 1512px;
+  margin: 0 auto;
+  padding: 0 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 521px;
+}
+
+.footerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.footerLogo {
+  width: 120px;
+  height: auto;
+}
+
+.footerTagline {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.219em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.footerRight {
+  display: flex;
+  gap: 69px;
+}
+
+.footerLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.footerLink {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.219em;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.footerLink:hover {
+  color: #ffffff;
+}
+
+.footerContacts {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.contactItem:hover {
+  opacity: 0.8;
+}
+
+.contactIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.contactText {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.219em;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========== МОБИЛКА ДО 768px ========== */
+@media (max-width: 768px) {
+
+  /* PAGE */
+  .contentWrapper {
+    padding: 80px 0 0;
+  }
+
+  .container {
+    padding: 20px 16px;
+  }
+
+  /* HEADER */
+  .pageHeader {
+    margin-bottom: 32px;
+  }
+
+  .pageTitle {
+    font-size: 22px;
+  }
+
+  .pageSubtitle {
+    font-size: 14px;
+  }
+
+  /* SEARCH BLOCK */
+  .searchWrapper {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .searchInput {
+    width: 100%;
+    padding: 12px 16px;
+    height: 46px;
+    border-radius: 20px;
+  }
+
+  .searchField {
+    font-size: 14px;
+  }
+
+  .searchButton,
+  .filterButton {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+  }
+
+  .searchButton span,
+  .filterButton span {
+    font-size: 14px;
+  }
+
+  /* ===== КАТЕГОРИИ СПЕЦИАЛЬНОСТЕЙ ===== */
+  .specialtiesWrapper {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .specialtiesWrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .specialtyButton {
+    flex-shrink: 0;
+    border: 1px solid #0c3465;
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    color: #0c3465;
+    white-space: nowrap;
+  }
+
+  .specialtyButton:hover {
+    background: #0c3465;
+    color: #ffffff;
+  }
+
+  /* DOCTORS LIST */
+  .doctorsList {
+    gap: 16px;
+  }
+
+  .doctorCard {
+    padding: 16px;
+    gap: 14px;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .doctorAvatar {
+    width: 70px;
+    height: 78px;
+  }
+
+  .doctorName {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .doctorPosition {
+    font-size: 13px;
+  }
+
+  .appointmentButton {
+    width: 100%;
+    height: 44px;
+    border-radius: 50px;
+  }
+
+  .appointmentButton .buttonText {
+    font-size: 14px;
+  }
+
+  /* SCROLLBAR (DESKTOP ONLY — скрываем) */
+  .scrollbar {
+    display: none;
+  }
+
+  /* FOOTER */
+  .footerContainer {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 20px;
+  }
+
+  .footerLogo {
+    width: 100px;
+  }
+
+  .footerTagline {
+    font-size: 14px;
+  }
+
+  .footerRight {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footerLink {
+    font-size: 14px;
+  }
+
+  .contactText {
+    font-size: 14px;
+  }
+}

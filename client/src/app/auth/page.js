@@ -1,0 +1,207 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import styles from "./page.module.css";
+import { supabase } from "@/lib/supabase";
+
+const AuthPage = () => {
+  const router = useRouter();
+  const [mode, setMode] = useState("login"); // "login" или "register"
+  const [step, setStep] = useState("phone");
+  const [phone, setPhone] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handlePhoneChange = (e) => {
+    setPhone(e.target.value);
+  };
+
+  const handleSendOTP = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      if (!phone.trim()) {
+        throw new Error("Введите номер телефона");
+      }
+
+      // Для регистрации обязательно ФИО
+      if (mode === "register" && !fullName.trim()) {
+        throw new Error("Введите ваше ФИО");
+      }
+
+      const cleanPhone = phone.startsWith("+") ? phone : `+${phone.replace(/\D/g, "")}`;
+
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: cleanPhone,
+        options: {
+          data: mode === "register" ? {
+            full_name: fullName,
+          } : {},
+        },
+      });
+
+      if (error) throw error;
+
+      setSuccess("Код отправлен! Проверьте SMS.");
+      setStep("verify");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const cleanPhone = phone.startsWith("+") ? phone : `+${phone.replace(/\D/g, "")}`;
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: cleanPhone,
+        token: otp,
+        type: "sms",
+      });
+
+      if (error) throw error;
+
+      // При регистрации создаем/обновляем профиль
+      if (mode === "register") {
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          phone: cleanPhone,
+          full_name: fullName,
+          updated_at: new Date().toISOString(),
+        });
+
+        if (profileError) throw profileError;
+      }
+
+      setSuccess(mode === "login" ? "Вход выполнен успешно!" : "Регистрация завершена!");
+      router.push("/profile");
+    } catch (err) {
+      setError(err.message || "Неверный код. Попробуйте снова.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    setStep("phone");
+    setOtp("");
+    setError("");
+    setSuccess("");
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.leftPanel}>
+        <div className={styles.logo}>
+          <svg viewBox="0 0 200 60" fill="white" style={{width: '200px', height: 'auto'}}>
+            <text x="10" y="40" fontSize="32" fontWeight="bold">SADAP</text>
+            <text x="10" y="55" fontSize="14">CLINIC</text>
+          </svg>
+        </div>
+      </div>
+
+      <div className={styles.rightPanel}>
+        <button className={styles.backButton} onClick={() => router.push("/")} type="button">
+          ← Вернуться назад
+        </button>
+
+        {step === "phone" ? (
+          <div className={styles.formContainer}>
+            <h1 className={styles.title}>
+              {mode === "login" 
+                ? "Введите ваш номер телефона, чтобы получить код"
+                : "Введите ваш номер телефона, чтобы создать ваш аккаунт"}
+            </h1>
+
+            <form onSubmit={handleSendOTP} className={styles.form}>
+              <div className={styles.inputGroup}>
+                <span className={styles.icon}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                    <line x1="12" y1="18" x2="12" y2="18"/>
+                  </svg>
+                </span>
+                <input type="tel" placeholder="Номер телефона" value={phone} onChange={handlePhoneChange} className={styles.input} required />
+              </div>
+
+              {mode === "register" && (
+                <div className={styles.inputGroup}>
+                  <span className={styles.icon}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </span>
+                  <input type="text" placeholder="ФИО" value={fullName} onChange={(e) => setFullName(e.target.value)} className={styles.input} required />
+                </div>
+              )}
+
+              {error && <div className={styles.error}>{error}</div>}
+              {success && <div className={styles.success}>{success}</div>}
+
+              <button type="submit" className={styles.submitButton} disabled={loading}>
+                {loading ? "Отправка..." : "Получить код"}
+              </button>
+
+              <p className={styles.hint}>
+                {mode === "login" ? (
+                  <>У вас нету аккаунта? <a href="#" onClick={(e) => { e.preventDefault(); setMode("register"); }} className={styles.link}>Зарегистрироваться.</a></>
+                ) : (
+                  <>У вас уже есть аккаунт? <a href="#" onClick={(e) => { e.preventDefault(); setMode("login"); }} className={styles.link}>Войти в аккаунт</a></>
+                )}
+              </p>
+            </form>
+          </div>
+        ) : (
+          <div className={styles.formContainer}>
+            <h1 className={styles.title}>
+              Введите ваш полученный код,<br />чтобы {mode === "login" ? "войти в ваш аккаунт" : "создать ваш аккаунт"}
+            </h1>
+
+            <form onSubmit={handleVerifyOTP} className={styles.form}>
+              <div className={styles.inputGroup}>
+                <span className={styles.icon}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </span>
+                <input type="text" placeholder="Код пароль" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} maxLength={6} className={styles.input} required />
+              </div>
+
+              {error && <div className={styles.error}>{error}</div>}
+              {success && <div className={styles.success}>{success}</div>}
+
+              <button type="submit" className={styles.submitButton} disabled={loading}>
+                {loading ? "Проверка..." : (mode === "login" ? "Войти" : "Зарегистрироваться")}
+              </button>
+
+              <p className={styles.hint}>
+                Не получили код? <a href="#" onClick={handleSendOTP} className={styles.link}>Отправить код повторно</a>
+              </p>
+
+              <button type="button" onClick={handleBack} className={styles.backLink}>
+                ← Изменить номер
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;

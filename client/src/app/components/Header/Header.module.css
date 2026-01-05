@@ -1,0 +1,123 @@
+.header {
+  background: #042955;
+  padding: 14px 0;
+}
+
+.headerFixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.headerContainer {
+  height: 50px;
+  max-width: 1512px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Уменьшенный логотип */
+.logoWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 120px;
+  margin-right: 50px;
+  height: auto;
+}
+
+/* Бургер */
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Навигация (десктоп) */
+.nav {
+  flex: 1;
+}
+
+.navList {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  font-family: var(--font-montserrat);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.navLink:hover {
+  opacity: 0.7;
+}
+
+/* ===================== */
+/*       MOBILE          */
+/* ===================== */
+
+@media (max-width: 768px) {
+.headerContainer {
+  max-width: 1512px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;  /* 👈 ВАЖНО */
+  height: 50px;
+  z-index: 200;        /* чтобы меню было поверх контента */
+}
+
+  /* показываем бургер */
+  .menuButton {
+    display: block;
+  }
+
+  /* прячем основное меню */
+  .nav {
+    display: none;
+  }
+
+  /* открытое меню */
+  .navOpen {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #042955;
+    padding: 20px;
+  }
+
+  .navList {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .navLink {
+    font-size: 16px;
+    padding: 8px 0;
+    display: block;
+  }
+
+  /* скрываем кнопку ЛК */
+  .accountButton {
+    display: none;
+  }
+}
