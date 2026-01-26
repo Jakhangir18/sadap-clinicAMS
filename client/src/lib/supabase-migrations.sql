@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS public.doctors (
   slug TEXT UNIQUE NOT NULL,
   specialization_title TEXT NOT NULL,
   short_description TEXT,
-  rating INT NOT NULL DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
+  rating NUMERIC(2,1) NOT NULL DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
   experience_years INT NOT NULL DEFAULT 0,
   education_text TEXT,
   working_hours_text TEXT,

@@ -16,6 +16,28 @@ export default function DoctorDetailPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
 
+  const reviews = useMemo(
+    () => [
+      {
+        name: "Арнау Жупарбеков",
+        text:
+          "Отличная клиника!!! Пришел по рекомендациям друзей и знакомых, не жалею, высокое качество обслуживания! Их методика лечения отличается от других!",
+        rating: 5,
+        color: "#5a50ff",
+        avatar: null,
+      },
+      {
+        name: "Кайсар Калибаев",
+        text:
+          "Я доволен! Самое лучшее место для медицинского обслуживания в Актау!!! Очень удобное расположение, посещаю после работы, персонал профессиональный, врачи опытные!! СПАСИБО!",
+        rating: 5,
+        color: "#4da8ff",
+        avatar: null,
+      },
+    ],
+    []
+  );
+
   useEffect(() => {
     if (!slug) return;
 
@@ -63,7 +85,7 @@ export default function DoctorDetailPage() {
       <div className={styles.doctorRating} style={{ position: 'relative', display: 'inline-block', lineHeight: 1 }}>
         <div aria-hidden style={{ color: '#e2e8f0' }}>★★★★★</div>
         <div aria-hidden style={{ color: '#ffa800', position: 'absolute', top: 0, left: 0, width: pct + '%', overflow: 'hidden', whiteSpace: 'nowrap' }}>★★★★★</div>
-        <span style={{ marginLeft: 8, fontWeight: 700, color: '#0c3465', fontSize: 14 }}>{Number(value).toFixed(1)}</span>
+        <span style={{ marginLeft: 8, fontWeight: 700, color: '#0c3465', fontSize: 14 }}>{value}</span>
       </div>
     );
   };
@@ -186,6 +208,51 @@ export default function DoctorDetailPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </section>
+
+          <section className={styles.reviewsCard} style={{ marginTop: 40 }}>
+            <h3 className={styles.reviewsTitle}>Отзывы</h3>
+            <div className={styles.reviewsContent}>
+              <div className={styles.videoContainer}>
+                <iframe
+                  className={styles.videoIframe}
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/4dtV3iF4MPg"
+                  title="Рекламный ролик клиники"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              <div className={styles.reviewsGrid}>
+                {reviews.map((review, idx) => (
+                  <div key={idx} className={styles.reviewItem}>
+                    <div className={styles.reviewHeader}>
+                      <div className={styles.reviewAvatar} style={{ background: review.color }}>
+                        <span style={{ color: '#fff', fontWeight: 700, display: 'block', textAlign: 'center', lineHeight: '50px' }}>
+                          {review.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
+                        </span>
+                      </div>
+                      <div className={styles.reviewInfo}>
+                        <p className={styles.reviewName}>{review.name}</p>
+                        <div className={styles.reviewRating}>
+                          {Array.from({ length: review.rating || 0 }).map((_, i) => (
+                            <span key={i} className={styles.reviewStar}>★</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className={styles.reviewText}>“{review.text}”</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.scrollbarContainer} aria-hidden>
+              <div className={styles.scrollbar}></div>
             </div>
           </section>
         </div>

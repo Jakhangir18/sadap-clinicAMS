@@ -55,6 +55,13 @@ export default function NewDoctorPage() {
   const [directionInput, setDirectionInput] = useState('');
   const [diseaseInput, setDiseaseInput] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [pendingCertificates, setPendingCertificates] = useState<Array<{ file: File; title: string; preview: string }>>([]);
+
+  useEffect(() => {
+    return () => {
+      pendingCertificates.forEach((c) => URL.revokeObjectURL(c.preview));
+    };
+  }, [pendingCertificates]);
 
   useEffect(() => {
     return () => {
@@ -107,6 +114,27 @@ export default function NewDoctorPage() {
           }
         }
       }
+
+      // Upload pending certificates and update DB
+      let uploadedCerts: { url: string; title: string }[] = [];
+      if (pendingCertificates.length > 0) {
+        for (let i = 0; i < pendingCertificates.length; i++) {
+          const item = pendingCertificates[i];
+          const ext = item.file.name.split('.').pop() || 'jpg';
+          const cPath = `cert-${inserted.slug || inserted.id}-${Date.now()}-${i}.${ext}`;
+          const cMime = getMimeType(item.file.name);
+          const { error: cErr } = await supabase.storage.from('certificates').upload(cPath, item.file, { contentType: cMime, upsert: true });
+          if (!cErr) {
+            const { data: cPub } = await supabase.storage.from('certificates').getPublicUrl(cPath);
+            if (cPub?.publicUrl) {
+              uploadedCerts.push({ url: cPub.publicUrl, title: item.title });
+            }
+          } else {
+            console.error('Upload certificate error:', cErr);
+          }
+        }
+      }
+      await supabase.from('doctors').update({ certificates: uploadedCerts }).eq('id', inserted.id);
 
       router.push('/admin/doctors');
     } catch (error) {
@@ -166,6 +194,65 @@ export default function NewDoctorPage() {
           <span>Порядок сортировки</span>
           <input type="number" name="sort_order" min="0" step="1" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: Number(e.target.value) })} />
         </label>
+
+        {/* Certificates */}
+        <div style={{ display: 'grid', gap: 8 }}>
+          <span style={{ fontWeight: 600 }}>Сертификаты</span>
+          <div style={{ display: 'grid', gap: 8 }}>
+            <span style={{ fontSize: 12, color: '#6b7280' }}>Добавить новые (несколько файлов)</span>
+            <input
+              type="file"
+              multiple
+              accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/avif"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                if (!files.length) return;
+                const next = files.map((file) => ({
+                  file,
+                  title: file.name.replace(/\.[^.]+$/, ''),
+                  preview: URL.createObjectURL(file),
+                }));
+                setPendingCertificates((prev) => [...prev, ...next]);
+                e.currentTarget.value = '';
+              }}
+            />
+            {pendingCertificates.length > 0 && (
+              <div style={{ display: 'grid', gap: 12 }}>
+                <span style={{ fontSize: 12, color: '#6b7280' }}>К загрузке</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                  {pendingCertificates.map((c, idx) => (
+                    <div key={idx} style={{ width: 160, border: '1px solid #e5e7eb', borderRadius: 8, background: '#fafafa', padding: 8, display: 'grid', gap: 6 }}>
+                      <div style={{ width: '100%', height: 100, overflow: 'hidden', borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img src={c.preview} alt={c.title || `new-certificate-${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Название"
+                        value={c.title}
+                        onChange={(e) => {
+                          const next = [...pendingCertificates];
+                          next[idx] = { ...next[idx], title: e.target.value };
+                          setPendingCertificates(next);
+                        }}
+                        style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 12 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          URL.revokeObjectURL(pendingCertificates[idx].preview);
+                          setPendingCertificates(pendingCertificates.filter((_, i) => i !== idx));
+                        }}
+                        style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid #ef4444', color: '#ef4444', background: '#fff', fontSize: 12 }}
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Образование</span>

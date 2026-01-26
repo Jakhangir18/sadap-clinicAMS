@@ -45,7 +45,7 @@ const DoctorsPage = () => {
 
       const { data, error } = await supabase
         .from("doctors")
-        .select("id, full_name, specialization_title, avatar_url, slug, is_published")
+        .select("id, full_name, specialization_title, avatar_url, slug, is_published, rating")
         .eq("is_published", true)
         .order("sort_order", { ascending: true, nullsFirst: false })
         .order("full_name", { ascending: true });
@@ -64,12 +64,15 @@ const DoctorsPage = () => {
               ? d.avatar_url + `?t=${Date.now()}`  // Добавляем timestamp чтобы обойти кэш
               : "/doctor.png";
 
+            const ratingValue = Number.isFinite(Number(d.rating)) ? Number(d.rating) : null;
+
             return {
               id: d.id,
               name: d.full_name || "Без имени",
               position: d.specialization_title || "Специализация не указана",
               avatar,
               slug: d.slug || d.id,
+              rating: ratingValue,
             };
           })
         : [];
@@ -215,6 +218,15 @@ const DoctorsPage = () => {
 
                     <div className={styles.doctorInfo}>
                       <h3 className={styles.doctorName}>{doctor.name}</h3>
+                      {typeof doctor.rating === 'number' && (
+                        <div className={styles.doctorRating}>
+                          <div className={styles.ratingStars}>
+                            <span className={styles.starsBackground}>★★★★★</span>
+                            <span className={styles.starsForeground} style={{ width: `${Math.max(0, Math.min(100, (doctor.rating / 5) * 100))}%` }}>★★★★★</span>
+                          </div>
+                          <span className={styles.ratingText}>{doctor.rating}</span>
+                        </div>
+                      )}
                       <p className={styles.doctorPosition}>{doctor.position}</p>
                     </div>
 

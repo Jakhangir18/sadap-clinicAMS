@@ -23,7 +23,13 @@ export default function AdminDoctorsPage() {
       .select('id, full_name, slug, specialization_title, rating, avatar_url, is_published, sort_order')
       .order('sort_order', { ascending: true, nullsFirst: false })
       .order('full_name', { ascending: true });
-    if (!error) setDoctors(data ?? []);
+    if (!error) {
+      const normalized = (data ?? []).map((d: any) => ({
+        ...d,
+        rating: Number.isFinite(Number(d.rating)) ? Number(d.rating) : null,
+      }));
+      setDoctors(normalized);
+    }
     setLoading(false);
   };
 
@@ -74,7 +80,7 @@ export default function AdminDoctorsPage() {
               <div style={{ fontSize: 12, color: '#6b7280' }}>slug: {d.slug || '—'}</div>
             </div>
             <div>{d.specialization_title || '—'}</div>
-            <div style={{ textAlign: 'center' }}>{typeof d.rating === 'number' ? d.rating.toFixed(1) : '—'}</div>
+            <div style={{ textAlign: 'center' }}>{Number.isFinite(d.rating) ? d.rating : '—'}</div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={() => handleTogglePublish(d.id, d.is_published)} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: d.is_published ? '#e8f5e9' : '#fff', color: d.is_published ? '#1b5e20' : '#374151' }}>
                 {d.is_published ? 'Скрыть' : 'Опубликовать'}

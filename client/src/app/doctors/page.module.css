@@ -259,6 +259,41 @@
   margin: 0 0 4px 0;
 }
 
+.doctorRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.ratingStars {
+  position: relative;
+  width: 80px;
+  height: 14px;
+  line-height: 14px;
+  font-size: 14px;
+}
+
+.starsBackground {
+  color: #e5e7eb;
+  display: block;
+}
+
+.starsForeground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  color: #f59e0b;
+  display: block;
+}
+
+.ratingText {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
 .doctorPosition {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 400;
