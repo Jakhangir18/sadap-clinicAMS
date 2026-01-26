@@ -139,7 +139,7 @@ export default function NewDoctorPage() {
       router.push('/admin/doctors');
     } catch (error) {
       console.error('Error creating doctor:', error);
-      alert('Не удалось создать врача: ' + (error as any)?.message ?? 'Ошибка');
+      alert('Не удалось создать врача: ' + (((error as any)?.message) ?? 'Ошибка'));
     } finally {
       setLoading(false);
     }

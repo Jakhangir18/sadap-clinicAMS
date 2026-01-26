@@ -192,7 +192,7 @@ export default function EditDoctorPage() {
       router.push('/admin/doctors');
     } catch (error) {
       console.error('Error updating doctor:', error);
-      alert('Не удалось сохранить врача: ' + (error as any)?.message ?? 'Ошибка');
+      alert('Не удалось сохранить врача: ' + (((error as any)?.message) ?? 'Ошибка'));
     } finally {
       setSaving(false);
     }
