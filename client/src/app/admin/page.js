@@ -2,11 +2,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/doctors");
+    router.replace("/admin/login");
   }, [router]);
 
   return null;

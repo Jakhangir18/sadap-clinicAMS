@@ -1,0 +1,21 @@
+<svg width="128" height="145" viewBox="0 0 128 145" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="128" height="145" fill="#f0f4f8"/>
+  
+  <!-- Doctor head -->
+  <circle cx="64" cy="35" r="20" fill="#d4a574"/>
+  
+  <!-- Doctor body - doctor coat -->
+  <path d="M 44 55 L 44 120 Q 44 130 54 130 L 74 130 L 74 120 L 84 120 L 84 130 Q 94 130 94 120 L 94 55 Z" fill="#ffffff" stroke="#0c3465" stroke-width="2"/>
+  
+  <!-- Stethoscope around neck -->
+  <path d="M 55 55 Q 64 65 73 55" stroke="#e74c3c" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Arms -->
+  <rect x="30" y="60" width="14" height="50" rx="7" fill="#d4a574"/>
+  <rect x="84" y="60" width="14" height="50" rx="7" fill="#d4a574"/>
+  
+  <!-- Medical cross on chest -->
+  <rect x="60" y="75" width="8" height="20" fill="#e74c3c"/>
+  <rect x="54" y="81" width="20" height="8" fill="#e74c3c"/>
+</svg>

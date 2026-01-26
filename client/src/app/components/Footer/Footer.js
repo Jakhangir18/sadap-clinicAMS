@@ -60,7 +60,7 @@ const Footer = () => {
             <a href="mailto:support@sadapclinic.kz" className={styles.contactItem}>
               <div className={styles.contactIcon}>
                 <Image
-                  src="/mail.png"
+                  src="/mail.svg"
                   alt="Email"
                   width={24}
                   height={24}

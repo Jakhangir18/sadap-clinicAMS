@@ -1,315 +1,236 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import styles from "./page.module.css";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
-import Header from "../../components/Header/Header";
+import { supabase } from "@/lib/supabase";
+import Footer from "@/app/components/Footer/Footer";
+import styles from "./page.module.css";
 
-// Данные врача (в реальном приложении будут приходить с сервера)
-const doctorData = {
-  name: "Ахметов Айдар Серикович",
-  position: "Врач-эндоскопист, заведующий отделением-врач-эндоскопист",
-  education: "Выпускник 1980 года Московский Медицинский Институт",
-  experience: "10+ лет опыта",
-  avatar: "/services/doctor.png",
-  rating: 5,
-  certificates: [
-    "/certificate1.png",
-    "/certificate2.png",
-    "/certificate3.png"
-  ]
-};
-
-const reviewsData = [
-  {
-    name: "Арнау Жупарбеков",
-    text: "Отличная клиника!!! Пришел по рекомендациям друзей и знакомых, не жалею, высокое качество обслуживания! Их методика лечения отличается от других!",
-    avatar: "/arnau.png",
-    rating: 5
-  },
-  {
-    name: "Кайсар Калибаев",
-    text: "Я доволен! Самое лучшее место для медицинского обслуживания в Актау!!! Очень удобное расположение, посещаю после работы, персонал профессиональный, врачи опытные!!! СПАСИБО!",
-    avatar: "/kaysar.png",
-    rating: 5
-  }
-];
-
-const DoctorDetailPage = () => {
+export default function DoctorDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const slug = params?.slug;
+
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
 
-  // Закрытие попапа по ESC
   useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === "Escape") {
-        setSelectedCertificate(null);
+    if (!slug) return;
+
+    const fetchDoctor = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("doctors")
+          .select("*")
+          .eq("slug", slug)
+          .eq("is_published", true)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Ошибка загрузки врача:", error);
+          setLoading(false);
+          return;
+        }
+
+        if (!data) {
+          console.log("Врач не найден");
+          setLoading(false);
+          return;
+        }
+
+        setDoctor(data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Ошибка:", err);
+        setLoading(false);
       }
     };
 
-    if (selectedCertificate) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+    fetchDoctor();
+    
+    // Обновляем данные при фокусе на странице
+    const handleFocus = () => {
+      console.log("Doctor page focused - refreshing");
+      fetchDoctor();
     };
-  }, [selectedCertificate]);
-
-  const openCertificate = (certSrc) => {
-    setSelectedCertificate(certSrc);
-  };
-
-  const closeCertificate = () => {
-    setSelectedCertificate(null);
-  };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [slug]);
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      closeCertificate();
+    if (e.target.classList.contains(styles.certificateModal)) {
+      setSelectedCertificate(null);
     }
   };
 
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Загрузка...</div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!doctor) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.notFound}>
+          <h2>Врач не найден</h2>
+          <button onClick={() => router.push("/doctors")} className={styles.backButton}>
+            Вернуться к списку врачей
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Подготовка данных
+  const directions = Array.isArray(doctor.directions) ? doctor.directions : [];
+  const diseaseTags = Array.isArray(doctor.disease_tags) ? doctor.disease_tags : [];
+  const certificates = Array.isArray(doctor.certificates) ? doctor.certificates : [];
+
   return (
-    <div className={styles.pageWrapper}>
-      <Header 
-        navItems={["Записаться на прием", "Выбрать врача", "Личный кабинет"]}
-        showAccountButton={false}
-        fixed={true}
-      />
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <button onClick={() => router.back()} className={styles.backButton}>
+          ← Назад
+        </button>
+      </div>
 
-      {/* Main Content */}
-      <main className={styles.main}>
-        <div className={styles.container}>
-          {/* Page Title */}
-          <h1 className={styles.pageTitle}>Подробнее о враче</h1>
-
-          {/* Doctor Info Card */}
-          <div className={styles.doctorCard}>
-            <div className={styles.doctorMainInfo}>
-              <div className={styles.doctorLeftSection}>
-                <div className={styles.doctorAvatar}>
-                  <Image
-                    src={doctorData.avatar}
-                    alt={doctorData.name}
-                    width={129}
-                    height={145}
-                    className={styles.avatarImage}
-                  />
-                </div>
-
-                <div className={styles.doctorDetails}>
-                  <h2 className={styles.doctorName}>{doctorData.name}</h2>
-                  <p className={styles.doctorPosition}>{doctorData.position}</p>
-
-                  <div className={styles.doctorRating}>
-                    {[...Array(doctorData.rating)].map((_, i) => (
-                      <span key={i} className={styles.star}>★</span>
-                    ))}
-                  </div>
-
-                  <button className={styles.appointmentButton}>
-                    <span className={styles.appointmentText}>Записаться на прием</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.doctorAdditionalInfo}>
-                <div className={styles.infoBlock}>
-                  <h3 className={styles.infoTitle}>Образование</h3>
-                  <p className={styles.infoText}>{doctorData.education}</p>
-                </div>
-
-                <div className={styles.infoBlock}>
-                  <h3 className={styles.infoTitle}>Стаж</h3>
-                  <p className={styles.infoText}>{doctorData.experience}</p>
-                </div>
-
-                <div className={styles.infoBlock}>
-                  <h3 className={styles.infoTitle}>Сертификаты и лицензии</h3>
-                  <div className={styles.certificatesGrid}>
-                    {doctorData.certificates.map((cert, index) => (
-                      <div
-                        key={index}
-                        className={styles.certificateItem}
-                        onClick={() => openCertificate(cert)}
-                      >
-                        <Image
-                          src={cert}
-                          alt={`Сертификат ${index + 1}`}
-                          width={107}
-                          height={153}
-                          className={styles.certificateImage}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <p className={styles.certificateNote}>
-                    Нажмите на сертификат чтобы увидеть подробнее
-                  </p>
-                </div>
-              </div>
-            </div>
+      <div className={styles.doctorContent}>
+        <div className={styles.doctorLeftSection}>
+          <div className={styles.doctorImageWrapper}>
+            <Image
+              src={doctor.avatar_url ? `${doctor.avatar_url}?t=${Date.now()}` : '/doctor.png'}
+              alt={doctor.full_name}
+              width={320}
+              height={400}
+              className={styles.doctorImage}
+              unoptimized={true}
+            />
           </div>
 
-          {/* Reviews Section */}
-          <div className={styles.reviewsCard}>
-            <h2 className={styles.reviewsTitle}>Отзывы</h2>
-
-            <div className={styles.reviewsContent}>
-              <div className={styles.videoContainer}>
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/4dtV3iF4MPg"
-                  title="Отзыв о клинике"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className={styles.videoIframe}
-                ></iframe>
+          <div className={styles.doctorMainInfo}>
+            <h2 className={styles.doctorName}>{doctor.full_name}</h2>
+            <p className={styles.doctorPosition}>{doctor.specialization_title}</p>
+            {doctor.rating > 0 && (
+              <div className={styles.doctorRating}>
+                {"★".repeat(doctor.rating)}
+                {"☆".repeat(5 - doctor.rating)}
               </div>
+            )}
+          </div>
+        </div>
 
-              <div className={styles.reviewsGrid}>
-                {reviewsData.map((review, index) => (
-                  <div key={index} className={styles.reviewItem}>
-                    <div className={styles.reviewHeader}>
-                      <div className={styles.reviewAvatar}>
-                        <Image
-                          src={review.avatar}
-                          alt={review.name}
-                          width={50}
-                          height={50}
-                          className={styles.reviewAvatarImage}
-                        />
-                      </div>
-                      <div className={styles.reviewInfo}>
-                        <h3 className={styles.reviewName}>{review.name}</h3>
-                        <div className={styles.reviewRating}>
-                          {[...Array(review.rating)].map((_, i) => (
-                            <span key={i} className={styles.reviewStar}>★</span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <p className={styles.reviewText}>"{review.text}"</p>
+        <div className={styles.doctorRightSection}>
+          {doctor.education_text && (
+            <div className={styles.doctorAdditionalInfo}>
+              <h3>Образование</h3>
+              <p>{doctor.education_text}</p>
+            </div>
+          )}
+
+          {doctor.experience_years > 0 && (
+            <div className={styles.doctorAdditionalInfo}>
+              <h3>Стаж</h3>
+              <p>{doctor.experience_years} лет опыта</p>
+            </div>
+          )}
+
+          {doctor.working_hours_text && (
+            <div className={styles.doctorAdditionalInfo}>
+              <h3>Время приема</h3>
+              <p>{doctor.working_hours_text}</p>
+            </div>
+          )}
+
+          {directions.length > 0 && (
+            <div className={styles.doctorAdditionalInfo}>
+              <h3>Направления</h3>
+              <ul className={styles.directionsList}>
+                {directions.map((direction, index) => (
+                  <li key={index}>{direction}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {diseaseTags.length > 0 && (
+            <div className={styles.doctorAdditionalInfo}>
+              <h3>Специализация по заболеваниям</h3>
+              <div className={styles.diseaseTags}>
+                {diseaseTags.map((tag, index) => (
+                  <span key={index} className={styles.diseaseTag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {certificates.length > 0 && (
+            <div className={styles.doctorCertificates}>
+              <h3>Сертификаты</h3>
+              <div className={styles.certificatesGrid}>
+                {certificates.map((cert, index) => (
+                  <div
+                    key={index}
+                    className={styles.certificateItem}
+                    onClick={() => setSelectedCertificate(cert.url)}
+                  >
+                    <Image
+                      src={cert.url}
+                      alt={cert.title || `Сертификат ${index + 1}`}
+                      width={150}
+                      height={200}
+                      className={styles.certificateImage}
+                    />
+                    {cert.title && <p className={styles.certificateTitle}>{cert.title}</p>}
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* <div className={styles.scrollbarContainer}>
-              <div className={styles.scrollbar}></div>
-            </div> */}
-          </div>
+          )}
         </div>
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerContainer}>
-          <div className={styles.footerLeft}>
-            <Image
-              src="/logo.png"
-              alt="Sadap Clinic"
-              width={120}
-              height={40}
-              className={styles.footerLogo}
-            />
-            <p className={styles.footerTagline}>Радость. Здоровье. Успех!</p>
-
-            <button className={styles.feedbackButton}>
-              Обратная связь
-            </button>
-          </div>
-
-          <div className={styles.footerRight}>
-            <div className={styles.footerLinks}>
-              <a href="#" className={styles.footerLink}>Записаться на прием</a>
-              <a href="#" className={styles.footerLink}>Выбрать врача</a>
-              <a href="#" className={styles.footerLink}>Личный кабинет</a>
-              <a href="#" className={styles.footerLink}>Расположение</a>
-            </div>
-
-            <div className={styles.footerContacts}>
-              <a href="tel:+77023012796" className={styles.contactItem}>
-                <Image
-                  src="/phone.png"
-                  alt="Phone"
-                  width={24}
-                  height={24}
-                  className={styles.contactIcon}
-                />
-                <span className={styles.contactItemText}>+7 702 301 2796</span>
-              </a>
-
-              <a href="https://instagram.com/sadapclinic_kz" target="_blank" rel="noopener noreferrer" className={styles.contactItem}>
-                <Image
-                  src="/instagram.png"
-                  alt="Instagram"
-                  width={24}
-                  height={24}
-                  className={styles.contactIcon}
-                />
-                <span className={styles.contactItemText}>@sadapclinic_kz</span>
-              </a>
-
-              <a href="mailto:support@sadapclinic.kz" className={styles.contactItem}>
-                <Image
-                  src="/mail.png"
-                  alt="Email"
-                  width={24}
-                  height={24}
-                  className={styles.contactIcon}
-                />
-                <span className={styles.contactItemText}>support@sadapclinic.kz</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Certificate Popup */}
-      {selectedCertificate && (
-        <div
-          className={styles.popupOverlay}
-          onClick={handleBackdropClick}
+      <div className={styles.appointmentSection}>
+        <h3>Записаться на прием</h3>
+        <button
+          onClick={() => router.push("/appointments")}
+          className={styles.appointmentButton}
         >
-          <div className={styles.popupContent}>
+          Записаться
+        </button>
+      </div>
+
+      {selectedCertificate && (
+        <div className={styles.certificateModal} onClick={handleBackdropClick}>
+          <div className={styles.certificateModalContent}>
             <button
-              className={styles.popupClose}
-              onClick={closeCertificate}
-              aria-label="Закрыть"
+              className={styles.certificateCloseButton}
+              onClick={() => setSelectedCertificate(null)}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M18 6L6 18M6 6L18 18"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              ✕
             </button>
-            <div className={styles.popupImageContainer}>
-              <Image
-                src={selectedCertificate}
-                alt="Сертификат"
-                width={800}
-                height={1200}
-                className={styles.popupImage}
-                unoptimized
-              />
-            </div>
+            <Image
+              src={selectedCertificate}
+              alt="Сертификат"
+              width={800}
+              height={1000}
+              className={styles.certificateFullImage}
+            />
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   );
-};
-
-export default DoctorDetailPage;
+}
 

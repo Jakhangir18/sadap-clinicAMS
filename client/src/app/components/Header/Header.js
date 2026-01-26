@@ -52,7 +52,7 @@ export default function Header({
           onClick={toggleMenu}
           aria-label={isOpen ? "Закрыть меню" : "Открыть меню"}
         >
-          <Image src="/menu.png" alt="Меню" width={24} height={24} />
+          <Image src="/menu.svg" alt="Меню" width={24} height={24} />
         </button>
 
         {/* НАВИГАЦИЯ */}

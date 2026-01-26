@@ -13,36 +13,43 @@
 }
 
 .container {
-  max-width: 1512px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 80px 180px;
+  padding: 56px 140px;
   position: relative;
 }
 
 /* Page Header */
 .pageHeader {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 40px;
 }
 
 .pageTitle {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1.219em;
   letter-spacing: 0.05em;
   color: #0b3364;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .pageSubtitle {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.219em;
   letter-spacing: 0.05em;
   color: #0b3364;
   margin: 0;
+}
+
+.loadingText {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  padding: 40px 20px;
 }
 
 /* Search and Filter */
@@ -54,19 +61,19 @@
 
 .searchInput {
   flex: 1;
-  max-width: 802px;
+  max-width: 720px;
   background: #ffffff;
-  border-radius: 30px;
-  padding: 15px 64px 15px 21px;
+  border-radius: 24px;
+  padding: 12px 56px 12px 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 50px;
+  gap: 10px;
+  height: 44px;
 }
 
 .searchIcon {
-  width: 21px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -76,7 +83,7 @@
   outline: none;
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 300;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.15em;
   letter-spacing: 0.05em;
   color: #000000;
@@ -88,8 +95,8 @@
 }
 
 .searchButton {
-  width: 160px;
-  height: 50px;
+  width: 140px;
+  height: 44px;
   background: #0c3465;
   border: none;
   border-radius: 5px;
@@ -106,22 +113,22 @@
 }
 
 .searchButton svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .searchButton span {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.219em;
   letter-spacing: 0.05em;
   color: #ffffff;
 }
 
 .filterButton {
-  width: 216px;
-  height: 50px;
+  width: 180px;
+  height: 44px;
   background: #0c3465;
   border: none;
   border-radius: 5px;
@@ -138,14 +145,14 @@
 }
 
 .filterIcon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .filterButton span {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.219em;
   letter-spacing: 0.05em;
   color: #ffffff;
@@ -153,23 +160,29 @@
 
 /* 🔹 КАТЕГОРИИ СПЕЦИАЛЬНОСТЕЙ ПОД ПОИСКОМ */
 .specialtiesWrapper {
-  margin-top: 8px;
-  margin-bottom: 32px;
+  margin-top: 12px;
+  margin-bottom: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+}
+
+.specialtyButtonActive {
+  background: #0c3465;
+  color: #ffffff;
+  border-color: #0c3465;
 }
 
 .specialtyButton {
   border: 1px solid #0c3465;
   background: #ffffff;
   border-radius: 999px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   cursor: pointer;
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0.05em;
+  font-size: 12px;
+  letter-spacing: 0.03em;
   color: #0c3465;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -184,38 +197,40 @@
 .doctorsList {
   display: flex;
   flex-direction: column;
-  gap: 27px;
+  gap: 34px;
+  margin-top: 8px;
 }
 
 .doctorCardLink {
   text-decoration: none;
   color: inherit;
   display: block;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .doctorCardLink:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .doctorCard {
   background: #ffffff;
   border-radius: 12px;
-  padding: 25px 39px 25px 39px;
+  padding: 18px 28px;
   display: flex;
   align-items: center;
-  gap: 24px;
-  transition: all 0.3s;
+  gap: 20px;
+  transition: box-shadow 0.3s ease;
+  position: relative;
 }
 
 .doctorCard:hover {
   box-shadow: 0 4px 12px rgba(4, 41, 85, 0.1);
-  transform: translateX(5px);
+  transform: none;
 }
 
 .doctorAvatar {
-  width: 73px;
-  height: 82px;
+  width: 64px;
+  height: 72px;
   border-radius: 100px;
   overflow: hidden;
   background: #e6e4e5;
@@ -238,28 +253,28 @@
 .doctorName {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  font-size: 30px;
+  font-size: 22px;
   line-height: 1.4em;
   color: #0c3465;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
 }
 
 .doctorPosition {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 400;
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1.15em;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   color: #000000;
   margin: 0;
 }
 
 .appointmentButton {
-  width: 205px;
-  height: 58px;
+  width: 160px;
+  height: 44px;
   background: #0c3465;
   border: none;
-  border-radius: 70px;
+  border-radius: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -277,8 +292,8 @@
 .buttonText {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 700;
-  font-size: 15px;
-  line-height: 4.067em;
+  font-size: 13px;
+  line-height: 1.2em;
   letter-spacing: 0.05em;
   color: #ffffff;
   text-align: center;
