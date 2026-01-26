@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -48,22 +48,24 @@ export default function DoctorDetailPage() {
       }
     };
 
+    // Загружаем данные только при монтировании/смене slug
     fetchDoctor();
-    
-    // Обновляем данные при фокусе на странице
-    const handleFocus = () => {
-      console.log("Doctor page focused - refreshing");
-      fetchDoctor();
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
   }, [slug]);
 
-  const handleBackdropClick = (e) => {
-    if (e.target.classList.contains(styles.certificateModal)) {
-      setSelectedCertificate(null);
-    }
+  const ratingValue = useMemo(() => {
+    const r = Number(doctor?.rating || 0);
+    return Number.isFinite(r) ? Math.min(5, Math.max(0, r)) : 0;
+  }, [doctor]);
+
+  const StarRating = ({ value }) => {
+    const pct = (Math.max(0, Math.min(5, Number(value))) / 5) * 100;
+    return (
+      <div className={styles.doctorRating} style={{ position: 'relative', display: 'inline-block', lineHeight: 1 }}>
+        <div aria-hidden style={{ color: '#e2e8f0' }}>★★★★★</div>
+        <div aria-hidden style={{ color: '#ffa800', position: 'absolute', top: 0, left: 0, width: pct + '%', overflow: 'hidden', whiteSpace: 'nowrap' }}>★★★★★</div>
+        <span style={{ marginLeft: 8, fontWeight: 700, color: '#0c3465', fontSize: 14 }}>{Number(value).toFixed(1)}</span>
+      </div>
+    );
   };
 
   if (loading) {
@@ -95,136 +97,107 @@ export default function DoctorDetailPage() {
   const certificates = Array.isArray(doctor.certificates) ? doctor.certificates : [];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <button onClick={() => router.back()} className={styles.backButton}>
-          ← Назад
-        </button>
-      </div>
+    <div className={styles.pageWrapper}>
+      <main className={styles.main}>
+        <div className={styles.container}>
+          <button onClick={() => router.back()} className={styles.backButton}>← Назад</button>
+          <h1 className={styles.pageTitle}>Подробнее о враче</h1>
 
-      <div className={styles.doctorContent}>
-        <div className={styles.doctorLeftSection}>
-          <div className={styles.doctorImageWrapper}>
-            <Image
-              src={doctor.avatar_url ? `${doctor.avatar_url}?t=${Date.now()}` : '/doctor.png'}
-              alt={doctor.full_name}
-              width={320}
-              height={400}
-              className={styles.doctorImage}
-              unoptimized={true}
-            />
-          </div>
+          <section className={styles.doctorCard}>
+            <div className={styles.doctorMainInfo}>
+              {/* Left */}
+              <div className={styles.doctorLeftSection}>
+                <div className={styles.doctorAvatar}>
+                  <Image
+                    src={doctor.avatar_url ? `${doctor.avatar_url}?t=${Date.now()}` : '/doctor.png'}
+                    alt={doctor.full_name}
+                    width={129}
+                    height={145}
+                    className={styles.avatarImage}
+                    unoptimized={true}
+                  />
+                </div>
 
-          <div className={styles.doctorMainInfo}>
-            <h2 className={styles.doctorName}>{doctor.full_name}</h2>
-            <p className={styles.doctorPosition}>{doctor.specialization_title}</p>
-            {doctor.rating > 0 && (
-              <div className={styles.doctorRating}>
-                {"★".repeat(doctor.rating)}
-                {"☆".repeat(5 - doctor.rating)}
+                <div className={styles.doctorDetails}>
+                  <h2 className={styles.doctorName}>{doctor.full_name}</h2>
+                  <p className={styles.doctorPosition}>{doctor.specialization_title}</p>
+                  {ratingValue > 0 && <StarRating value={ratingValue} />}
+                  <button onClick={() => router.push('/appointments')} className={styles.appointmentButton}>
+                    <span className={styles.appointmentText}>Записаться на прием</span>
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        <div className={styles.doctorRightSection}>
-          {doctor.education_text && (
-            <div className={styles.doctorAdditionalInfo}>
-              <h3>Образование</h3>
-              <p>{doctor.education_text}</p>
-            </div>
-          )}
-
-          {doctor.experience_years > 0 && (
-            <div className={styles.doctorAdditionalInfo}>
-              <h3>Стаж</h3>
-              <p>{doctor.experience_years} лет опыта</p>
-            </div>
-          )}
-
-          {doctor.working_hours_text && (
-            <div className={styles.doctorAdditionalInfo}>
-              <h3>Время приема</h3>
-              <p>{doctor.working_hours_text}</p>
-            </div>
-          )}
-
-          {directions.length > 0 && (
-            <div className={styles.doctorAdditionalInfo}>
-              <h3>Направления</h3>
-              <ul className={styles.directionsList}>
-                {directions.map((direction, index) => (
-                  <li key={index}>{direction}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {diseaseTags.length > 0 && (
-            <div className={styles.doctorAdditionalInfo}>
-              <h3>Специализация по заболеваниям</h3>
-              <div className={styles.diseaseTags}>
-                {diseaseTags.map((tag, index) => (
-                  <span key={index} className={styles.diseaseTag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {certificates.length > 0 && (
-            <div className={styles.doctorCertificates}>
-              <h3>Сертификаты</h3>
-              <div className={styles.certificatesGrid}>
-                {certificates.map((cert, index) => (
-                  <div
-                    key={index}
-                    className={styles.certificateItem}
-                    onClick={() => setSelectedCertificate(cert.url)}
-                  >
-                    <Image
-                      src={cert.url}
-                      alt={cert.title || `Сертификат ${index + 1}`}
-                      width={150}
-                      height={200}
-                      className={styles.certificateImage}
-                    />
-                    {cert.title && <p className={styles.certificateTitle}>{cert.title}</p>}
+              {/* Right */}
+              <div className={styles.doctorAdditionalInfo}>
+                {doctor.education_text && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Образование</h3>
+                    <p className={styles.infoText}>{doctor.education_text}</p>
                   </div>
-                ))}
+                )}
+
+                {doctor.experience_years > 0 && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Стаж</h3>
+                    <p className={styles.infoText}>{doctor.experience_years}+ лет опыта</p>
+                  </div>
+                )}
+
+                {doctor.working_hours_text && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Время приема</h3>
+                    <p className={styles.infoText}>{doctor.working_hours_text}</p>
+                  </div>
+                )}
+
+                {directions.length > 0 && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Направления</h3>
+                    <ul className={styles.listText} style={{ margin: 0 }}>
+                      {directions.map((direction, index) => (
+                        <li key={index}>{direction}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {diseaseTags.length > 0 && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Специализация по заболеваниям</h3>
+                    <div className={styles.tagsRow}>
+                      {diseaseTags.map((tag, index) => (
+                        <span key={index} className={styles.tagBadge}>{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {certificates.length > 0 && (
+                  <div className={styles.infoBlock}>
+                    <h3 className={styles.infoTitle}>Сертификаты и лицензии</h3>
+                    <div className={styles.certificatesGrid}>
+                      {certificates.map((cert, index) => (
+                        <div key={index} className={styles.certificateItem} onClick={() => setSelectedCertificate(cert.url)}>
+                          <Image src={cert.url} alt={cert.title || `Сертификат ${index + 1}`} width={107} height={153} className={styles.certificateImage} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </section>
         </div>
-      </div>
-
-      <div className={styles.appointmentSection}>
-        <h3>Записаться на прием</h3>
-        <button
-          onClick={() => router.push("/appointments")}
-          className={styles.appointmentButton}
-        >
-          Записаться
-        </button>
-      </div>
+      </main>
 
       {selectedCertificate && (
-        <div className={styles.certificateModal} onClick={handleBackdropClick}>
-          <div className={styles.certificateModalContent}>
-            <button
-              className={styles.certificateCloseButton}
-              onClick={() => setSelectedCertificate(null)}
-            >
-              ✕
-            </button>
-            <Image
-              src={selectedCertificate}
-              alt="Сертификат"
-              width={800}
-              height={1000}
-              className={styles.certificateFullImage}
-            />
+        <div className={styles.popupOverlay} onClick={() => setSelectedCertificate(null)}>
+          <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.popupClose} onClick={() => setSelectedCertificate(null)}>✕</button>
+            <div className={styles.popupImageContainer}>
+              <Image src={selectedCertificate} alt="Сертификат" width={800} height={1000} className={styles.popupImage} />
+            </div>
           </div>
         </div>
       )}
